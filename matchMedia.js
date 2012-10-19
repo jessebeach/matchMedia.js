@@ -8,13 +8,11 @@
  *
  * Adapted from https://github.com/paulirish/matchMedia.js with the addition
  * of addListener and removeListener. The polyfill referenced above uses
- * polling (SetTimeout) to trigger registered listeners on matchMedia tests.
+ * polling to trigger registered listeners on matchMedia tests.
  * This polyfill triggers tests on window resize and orientationchange.
  */
 
-//window.matchMedia ||
-
-window.matchMedia = (function (doc) {
+window.matchMedia = window.matchMedia || (function (doc) {
 
   "use strict";
 
@@ -77,12 +75,12 @@ window.matchMedia = (function (doc) {
           var cb = debounced;
           self.check();
           cb.call(self, self);
-        }
+        };
       }(this, debounce(callback, 250)));
       this.listeners.push({
         'callback': callback,
         'handler': handler
-      }),
+      });
       window.addEventListener('resize', handler);
       window.addEventListener('orientationchange', handler);
     },
@@ -122,13 +120,17 @@ window.matchMedia = (function (doc) {
         timeout = null;
         result = callback.apply(context, args);
       };
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
+      window.clearTimeout(timeout);
+      timeout = window.setTimeout(later, wait);
       return result;
     };
   }
   /**
+   * Return a MediaQueryList.
    *
+   * @param {String} q
+   *   A media query e.g. "screen" or "screen and (min-width: 28em)". The media
+   *   query is checked for applicability before the object is returned.
    */
   return function (q) {
     // Build a new MediaQueryList object with the result of the check.
